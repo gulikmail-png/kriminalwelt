@@ -3,25 +3,26 @@ export default function HomePage() {
     <main
       style={{
         minHeight: "100vh",
+        background: "#0b0b0b",
         display: "grid",
         placeItems: "center",
-        background: "#111",
         color: "white",
-        fontFamily: "system-ui",
+        fontFamily:
+          'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
       }}
     >
-      <div style={{ textAlign: "center" }}>
-        <div style={{ opacity: 0.5, letterSpacing: 3, marginBottom: 10 }}>
+      <div style={{ textAlign: "center", opacity: 0.95 }}>
+        <div style={{ fontSize: 12, letterSpacing: 2, opacity: 0.6 }}>
           KRIMINALWELT
         </div>
-
-        <h1 style={{ fontSize: 48, margin: 0 }}>
+        <h1 style={{ marginTop: 10, fontSize: 44, marginBottom: 8 }}>
           Zugriff gewährt
         </h1>
+        <div style={{ opacity: 0.7 }}>Du bist eingeloggt.</div>
 
-        <p style={{ opacity: 0.7, marginTop: 12 }}>
-          Du bist eingeloggt.
-        </p>
+        <div style={{ marginTop: 26, opacity: 0.55, fontSize: 12 }}>
+          (Diese Seite ist absichtlich schlicht. Später kommt hier die echte Startseite.)
+        </div>
       </div>
     </main>
   );
