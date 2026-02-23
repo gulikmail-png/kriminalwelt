@@ -1,28 +1,36 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyToken } from "./lib/auth";
+import { verifyToken } from "@/lib/auth";
 
 export async function middleware(req: NextRequest) {
-  const token = req.cookies.get("kriminalwelt_auth")?.value;
+  const { pathname } = req.nextUrl;
 
-  const isLoginPage = req.nextUrl.pathname.startsWith("/login");
-  const isApi = req.nextUrl.pathname.startsWith("/api");
-
-  if (isLoginPage || isApi) return NextResponse.next();
-
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  // öffentlich:
+  if (pathname.startsWith("/login") || pathname.startsWith("/api/login") || pathname.startsWith("/_next") || pathname.startsWith("/favicon.ico")) {
+    return NextResponse.next();
   }
 
-  const valid = await verifyToken(token);
+  // alles unter /kriminalwelt schützen
+  if (pathname.startsWith("/kriminalwelt")) {
+    const token = req.cookies.get("kriminalwelt_auth")?.value;
 
-  if (!valid) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    if (!token) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+
+    const ok = await verifyToken(token);
+    if (!ok) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico).*)"],
+  matcher: ["/kriminalwelt/:path*"],
 };
