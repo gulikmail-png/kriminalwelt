@@ -4,38 +4,41 @@ import { useState } from "react";
 
 export default function LoginPage() {
   const [pw, setPw] = useState("");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    const password = pw.trim();
+
+    if (!password) {
+      setError("Bitte Passwort eingeben.");
+      return;
+    }
 
     try {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: {
           "content-type": "application/json",
+          "accept": "application/json",
+          "cache-control": "no-cache",
         },
-        body: JSON.stringify({ password: pw }),
+        cache: "no-store",
+        body: JSON.stringify({ password }),
       });
 
-      // 401 = wirklich falsches Passwort
-      if (res.status === 401) {
-        setError("Falsches Passwort.");
-        return;
-      }
-
-      // andere Fehler (z.B. JSON kaputt, Serverproblem)
       if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        setError(`Login fehlgeschlagen (${res.status}). ${txt ? txt.slice(0, 120) : ""}`.trim());
+        const text = await res.text().catch(() => "");
+        setError(`Login fehlgeschlagen (HTTP ${res.status}).`);
         return;
       }
 
-      // ok -> weiter (Cookie ist gesetzt)
-      window.location.href = "/kriminalwelt";
+      // Login ok → auf Startseite
+      window.location.href = "/";
     } catch (err) {
-      setError("Netzwerkfehler. Bitte Seite neu laden und nochmal versuchen.");
+      setError("Netzwerkfehler – Request nicht möglich.");
     }
   }
 
@@ -54,69 +57,61 @@ export default function LoginPage() {
         style={{
           background: "white",
           padding: 32,
-          borderRadius: 16,
-          width: 520,
-          maxWidth: "92vw",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
-          border: "1px solid rgba(0,0,0,0.06)",
+          borderRadius: 12,
+          width: 420,
+          maxWidth: "100%",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
         }}
       >
-        <div style={{ fontSize: 12, letterSpacing: 1.2, opacity: 0.6, marginBottom: 10 }}>
+        <div style={{ letterSpacing: 2, fontSize: 12, opacity: 0.6, marginBottom: 8 }}>
           KRIMINALWELT
         </div>
 
-        <div style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, marginBottom: 12 }}>
+        <h1 style={{ margin: 0, marginBottom: 8, fontSize: 40 }}>
           Login
+        </h1>
+
+        <div style={{ opacity: 0.7, marginBottom: 18 }}>
+          Zugang zum Kriminalwelt-Prototypen.
         </div>
-
-        <div style={{ opacity: 0.7, marginBottom: 22 }}>Zugang zum Kriminalwelt-Prototypen.</div>
-
-        <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
-          Passwort
-        </label>
 
         <input
           type="password"
+          placeholder="Passwort"
           value={pw}
           onChange={(e) => setPw(e.target.value)}
-          placeholder="••••••••"
-          autoComplete="current-password"
           style={{
             width: "100%",
-            padding: 14,
-            borderRadius: 10,
-            border: "1px solid rgba(0,0,0,0.18)",
-            outline: "none",
-            fontSize: 16,
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
+            border: "1px solid #ddd",
           }}
         />
 
-        {error ? (
-          <div style={{ color: "#b00020", marginTop: 10, marginBottom: 10, fontSize: 13 }}>
+        {error && (
+          <div style={{ color: "#c00", marginBottom: 12, fontSize: 13 }}>
             {error}
           </div>
-        ) : (
-          <div style={{ height: 33 }} />
         )}
 
         <button
           type="submit"
           style={{
             width: "100%",
-            padding: 14,
+            padding: 12,
             borderRadius: 10,
             border: "none",
             background: "black",
             color: "white",
-            fontWeight: 700,
-            fontSize: 15,
+            fontWeight: 600,
             cursor: "pointer",
           }}
         >
           Weiter
         </button>
 
-        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.55 }}>
+        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.5 }}>
           (Provisorischer Login – wird später „richtig“ gemacht.)
         </div>
       </form>
