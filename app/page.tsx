@@ -1,66 +1,116 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState("");
+
+  // Wenn schon "eingeloggt", direkt weiter
+  useEffect(() => {
+    const ok = localStorage.getItem("kriminalwelt_auth") === "1";
+    if (ok) router.replace("/kriminalwelt");
+  }, [router]);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    // Provisorisches Passwort
+    const isOk = pw.trim() === "kriminalwelt";
+
+    if (!isOk) {
+      setError("Falsches Passwort.");
+      return;
+    }
+
+    localStorage.setItem("kriminalwelt_auth", "1");
+    router.push("/kriminalwelt");
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "grid",
+        placeItems: "center",
+        background: "white",
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          width: 520,
+          maxWidth: "calc(100vw - 48px)",
+          borderRadius: 18,
+          border: "1px solid rgba(0,0,0,0.08)",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.10)",
+          padding: 32,
+          background: "white",
+        }}
+      >
+        <div style={{ letterSpacing: 2, fontSize: 12, color: "#777" }}>
+          RELEVANT.DE
+        </div>
+
+        <h1 style={{ marginTop: 10, marginBottom: 6, fontSize: 34 }}>
+          Login
+        </h1>
+
+        <div style={{ color: "#666", marginBottom: 22 }}>
+          Zugang zum Kriminalwelt-Prototypen.
+        </div>
+
+        <label style={{ fontSize: 13, display: "block", marginBottom: 8 }}>
+          Passwort
+        </label>
+
+        <input
+          type="password"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+          placeholder="••••••••"
+          style={{
+            width: "100%",
+            padding: "12px 14px",
+            borderRadius: 12,
+            border: "1px solid rgba(0,0,0,0.18)",
+            outline: "none",
+            fontSize: 16,
+          }}
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        {error ? (
+          <div style={{ marginTop: 10, fontSize: 13, color: "#b00020" }}>
+            {error}
+          </div>
+        ) : (
+          <div style={{ height: 18 }} />
+        )}
+
+        <button
+          type="submit"
+          style={{
+            marginTop: 14,
+            width: "100%",
+            padding: "12px 12px",
+            borderRadius: 12,
+            border: "none",
+            background: "black",
+            color: "white",
+            fontSize: 15,
+            cursor: "pointer",
+          }}
+        >
+          Weiter
+        </button>
+
+        <div style={{ marginTop: 12, fontSize: 12, color: "#888" }}>
+          (Provisorischer Login – wird später „richtig“ gemacht.)
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </form>
     </div>
   );
 }
