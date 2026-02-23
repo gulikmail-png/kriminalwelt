@@ -10,35 +10,32 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const password = pw.trim(); // <- wichtig (Leerzeichen killen sonst alles)
-
     try {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
-        cache: "no-store",
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password: pw }),
       });
 
-      if (!res.ok) {
-        // versuch JSON zu lesen, falls vorhanden
-        let msg = `Login fehlgeschlagen (HTTP ${res.status}).`;
-        try {
-          const data = await res.json();
-          if (data?.error) msg = `${msg} ${data.error}`;
-        } catch {
-          // ignore
-        }
-        setError(msg);
+      // 401 = wirklich falsches Passwort
+      if (res.status === 401) {
+        setError("Falsches Passwort.");
         return;
       }
 
-      // Erfolg -> jetzt auf geschützte Startseite
+      // andere Fehler (z.B. JSON kaputt, Serverproblem)
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        setError(`Login fehlgeschlagen (${res.status}). ${txt ? txt.slice(0, 120) : ""}`.trim());
+        return;
+      }
+
+      // ok -> weiter (Cookie ist gesetzt)
       window.location.href = "/kriminalwelt";
     } catch (err) {
-      setError("Netzwerkfehler: Login-Request konnte nicht gesendet werden.");
+      setError("Netzwerkfehler. Bitte Seite neu laden und nochmal versuchen.");
     }
   }
 
@@ -48,30 +45,33 @@ export default function LoginPage() {
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        background: "white",
+        background: "#f4f4f4",
         padding: 24,
       }}
     >
       <form
         onSubmit={handleLogin}
         style={{
-          width: 520,
-          maxWidth: "100%",
           background: "white",
-          borderRadius: 16,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
           padding: 32,
+          borderRadius: 16,
+          width: 520,
+          maxWidth: "92vw",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
           border: "1px solid rgba(0,0,0,0.06)",
         }}
       >
-        <div style={{ fontSize: 12, letterSpacing: 2, color: "#777", marginBottom: 8 }}>
+        <div style={{ fontSize: 12, letterSpacing: 1.2, opacity: 0.6, marginBottom: 10 }}>
           KRIMINALWELT
         </div>
 
-        <div style={{ fontSize: 42, fontWeight: 750, marginBottom: 6 }}>Login</div>
-        <div style={{ color: "#666", marginBottom: 22 }}>Zugang zum Kriminalwelt-Prototypen.</div>
+        <div style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, marginBottom: 12 }}>
+          Login
+        </div>
 
-        <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+        <div style={{ opacity: 0.7, marginBottom: 22 }}>Zugang zum Kriminalwelt-Prototypen.</div>
+
+        <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
           Passwort
         </label>
 
@@ -83,21 +83,20 @@ export default function LoginPage() {
           autoComplete="current-password"
           style={{
             width: "100%",
-            padding: "14px 14px",
+            padding: 14,
             borderRadius: 10,
             border: "1px solid rgba(0,0,0,0.18)",
             outline: "none",
             fontSize: 16,
-            marginBottom: 10,
           }}
         />
 
         {error ? (
-          <div style={{ color: "#c62828", marginBottom: 12, fontSize: 13, lineHeight: 1.4 }}>
+          <div style={{ color: "#b00020", marginTop: 10, marginBottom: 10, fontSize: 13 }}>
             {error}
           </div>
         ) : (
-          <div style={{ height: 18 }} />
+          <div style={{ height: 33 }} />
         )}
 
         <button
@@ -105,19 +104,19 @@ export default function LoginPage() {
           style={{
             width: "100%",
             padding: 14,
-            borderRadius: 12,
+            borderRadius: 10,
             border: "none",
             background: "black",
             color: "white",
-            fontSize: 16,
             fontWeight: 700,
+            fontSize: 15,
             cursor: "pointer",
           }}
         >
           Weiter
         </button>
 
-        <div style={{ marginTop: 12, color: "#888", fontSize: 12 }}>
+        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.55 }}>
           (Provisorischer Login – wird später „richtig“ gemacht.)
         </div>
       </form>
