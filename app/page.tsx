@@ -52,7 +52,7 @@ export default function Home() {
         }}
       >
         <div style={{ letterSpacing: 2, fontSize: 12, color: "#777" }}>
-          RELEVANT.DE
+          KRIMINALWELT
         </div>
 
         <h1 style={{ marginTop: 10, marginBottom: 6, fontSize: 34 }}>
