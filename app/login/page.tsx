@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./page.module.css";
 
 export default function LoginPage() {
   const [pw, setPw] = useState("");
@@ -35,86 +36,46 @@ export default function LoginPage() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#f4f4f4",
-        display: "grid",
-        placeItems: "center",
-        fontFamily:
-          'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
-      }}
-    >
-      <form
-        onSubmit={handleLogin}
-        style={{
-          width: 420,
-          background: "white",
-          padding: 32,
-          borderRadius: 16,
-          boxShadow: "0 16px 60px rgba(0,0,0,0.10)",
-        }}
-      >
-        <div style={{ fontSize: 12, letterSpacing: 2, opacity: 0.55 }}>
-          KRIMINALWELT
+    <main className={styles.main}>
+      <div className={styles.background} />
+      <div className={styles.scrim} />
+
+      <div className={styles.layout}>
+        <header className={styles.header}>
+          <img
+            src="/KW_Logo.svg"
+            alt="Kriminalwelt"
+            className={styles.logo}
+          />
+        </header>
+
+        <div className={styles.center}>
+          <form onSubmit={handleLogin} className={styles.form}>
+            <label className={styles.label} htmlFor="password">
+              Passwort
+            </label>
+
+            <input
+              id="password"
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder="••••••••"
+              className={styles.input}
+            />
+
+            {error && <div className={styles.error}>{error}</div>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={styles.button}
+            >
+              {loading ? "Bitte warten…" : "Bestätigen"}
+            </button>
+          </form>
         </div>
-
-        <h1 style={{ marginTop: 10, fontSize: 40, marginBottom: 6 }}>
-          Login
-        </h1>
-
-        <div style={{ opacity: 0.65, marginBottom: 18 }}>
-          Zugang zum Kriminalwelt-Prototypen.
-        </div>
-
-        <label style={{ display: "block", fontSize: 12, opacity: 0.75 }}>
-          Passwort
-        </label>
-
-        <input
-          type="password"
-          value={pw}
-          onChange={(e) => setPw(e.target.value)}
-          placeholder="••••••••"
-          style={{
-            marginTop: 8,
-            width: "100%",
-            padding: 12,
-            borderRadius: 10,
-            border: "1px solid #ddd",
-            outline: "none",
-          }}
-        />
-
-        {error && (
-          <div style={{ color: "#c01818", marginTop: 10, fontSize: 13 }}>
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            marginTop: 16,
-            width: "100%",
-            padding: 12,
-            borderRadius: 10,
-            border: "none",
-            background: "black",
-            color: "white",
-            fontWeight: 700,
-            cursor: loading ? "default" : "pointer",
-            opacity: loading ? 0.6 : 1,
-          }}
-        >
-          {loading ? "…" : "Weiter"}
-        </button>
-
-        <div style={{ marginTop: 10, fontSize: 12, opacity: 0.55 }}>
-          (Provisorischer Login – wird später „richtig“ gemacht.)
-        </div>
-      </form>
+      </div>
     </main>
   );
 }
